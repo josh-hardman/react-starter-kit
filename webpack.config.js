@@ -1,10 +1,15 @@
 /*
     ./webpack.config.js
 */
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
+  "files": {
+    "css": [ "styles.css"],
+    "js": ["./"]
+  },
   template: './client/index.html',
   filename: 'index.html',
   inject: 'body'
@@ -17,10 +22,25 @@ module.exports = {
     filename: 'index_bundle.js'
   },
   module: {
-    loaders: [
-      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
-      { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ }
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: 'babel-loader'
+      },
+      {
+        test: /\.css/,
+        use: ['style-loader', 'css-loader']
+      }
     ]
   },
-  plugins: [HtmlWebpackPluginConfig]
+  devServer: {
+    contentBase: path.join(__dirname, "client"),
+    compress: true,
+    port: 9000
+  },
+  plugins: [
+    HtmlWebpackPluginConfig,
+    new ExtractTextPlugin({ filename: '[name].css', allChunks: true })
+  ]
 }
